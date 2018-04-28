@@ -91,8 +91,8 @@ func makeMuxRouter() http.Handler {
 }
 
 func handleGetBlockchain(w http.ResponseWriter, r *http.Request) {
-	bytes, err:= json.MarshalIndent(Blockchain, "", "  ")
-	if err!=nil{
+	bytes, err := json.MarshalIndent(Blockchain, "", "  ")
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -102,30 +102,30 @@ func handleGetBlockchain(w http.ResponseWriter, r *http.Request) {
 func handleWriteBlock(w http.ResponseWriter, r *http.Request) {
 	var m Message
 	decoder := json.NewDecoder(r.Body)
-	if err:=decoder.Decode(&m); err!=nil{
+	if err := decoder.Decode(&m); err != nil {
 		respondWithJSON(w, r, http.StatusBadRequest, r.Body)
 		return
 	}
 	defer r.Body.Close()
 
 	newBlock, err := generateBlock(Blockchain[len(Blockchain)-1], m.BPM)
-	if err!=nil {
+	if err != nil {
 		respondWithJSON(w, r, http.StatusInternalServerError, m)
 		return
 	}
 
-	if isBlockValid(newBlock, Blockchain[len(Blockchain) - 1]){
-		newBlockchain:=append(Blockchain, newBlock)
+	if isBlockValid(newBlock, Blockchain[len(Blockchain)-1]) {
+		newBlockchain := append(Blockchain, newBlock)
 		replaceChain(newBlockchain)
 		spew.Dump(Blockchain)
 	}
 
-	respondWithJSON(w,r , http.StatusCreated, newBlock)
+	respondWithJSON(w, r, http.StatusCreated, newBlock)
 }
 
-func respondWithJSON(w http.ResponseWriter, r *http.Request, code int, payload interface{}){
+func respondWithJSON(w http.ResponseWriter, r *http.Request, code int, payload interface{}) {
 	response, err := json.MarshalIndent(payload, "", "  ")
-	if err!=nil{
+	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("HTTP 500: Internal Server Error"))
 		return
@@ -136,15 +136,15 @@ func respondWithJSON(w http.ResponseWriter, r *http.Request, code int, payload i
 
 func main() {
 	err := godotenv.Load("resources.env")
-	if err!=nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 
 	go func() {
-		t:=time.Now()
-		genesisBlock:=Block{0, t.String(), 0, "", ""}
+		t := time.Now()
+		genesisBlock := Block{0, t.String(), 0, "", ""}
 		spew.Dump(generateBlock)
-		Blockchain=append(Blockchain, genesisBlock)
+		Blockchain = append(Blockchain, genesisBlock)
 	}()
 	log.Fatal(run())
 }
