@@ -40,7 +40,7 @@ func NewBlock(data string, prevBlockHash []byte) *Block {
 
 func NewProofOfWork(b *Block) *ProofOfWork {
 	target := big.NewInt(1)
-	target.Lsh(target, uint(256-targetBits)) // 左移232位？
+	target.Lsh(target, uint(256-targetBits)) // 左移232位，这样一个256位的数的前24位就都是0了
 	pow := &ProofOfWork{b, target}
 	return pow
 }
@@ -52,11 +52,11 @@ func (pow *ProofOfWork) Run() (int, []byte) {
 	nonce := 0
 	fmt.Printf("Mining the block containing \" %s \"\n", pow.block.Data)
 	for nonce < maxNonce {
-		data := pow.prepareData(nonce)
-		hash = sha256.Sum256(data)
+		data := pow.prepareData(nonce) //1.准备数据
+		hash = sha256.Sum256(data)     //2.用SHA-256对数据进行哈希
 		fmt.Printf("\r%x", hash)
-		hashInt.SetBytes(hash[:])
-		if hashInt.Cmp(pow.target) == -1 {
+		hashInt.SetBytes(hash[:]) //3.将哈希转换成一个大整数
+		if hashInt.Cmp(pow.target) == -1 { //4.如果比目标工作量证明的值要小，那么就break掉，代表挖到矿了
 			break
 		} else {
 			nonce++
@@ -81,10 +81,10 @@ func (pow *ProofOfWork) prepareData(nonce int) []byte {
 }
 func (pow *ProofOfWork) Validate() bool {
 	var hashInt big.Int
-	data:=pow.prepareData(pow.block.Nonce)
-	hash:=sha256.Sum256(data)
+	data := pow.prepareData(pow.block.Nonce)
+	hash := sha256.Sum256(data)
 	hashInt.SetBytes(hash[:])
-	isValid:=hashInt.Cmp(pow.target)==-1
+	isValid := hashInt.Cmp(pow.target) == -1
 	return isValid
 }
 
@@ -102,14 +102,22 @@ func NewGenesisBlock() *Block {
 }
 
 func main() {
+	data1 := []byte("I like donuts")
+	data2 := []byte("I like donutsca07ca")
+	target := big.NewInt(1)
+	target.Lsh(target, uint(256-targetBits))
+	fmt.Printf("%x\n", sha256.Sum256(data1))
+	fmt.Printf("%64x\n", target)
+	fmt.Printf("%x\n", sha256.Sum256(data2))
+
 	bc := NewBlockchain()
 	bc.AddBlock("Send 1 BTC to 土拨鼠")
 	bc.AddBlock("Send 2 more BTC to 土拨鼠")
-	for _, block:=range bc.blocks {
+	for _, block := range bc.blocks {
 		fmt.Printf("Prev. hash: %x\n", block.PrevBlockHash)
 		fmt.Printf("Data: %s\n", block.Data)
 		fmt.Printf("Hash: %x\n", block.Hash)
-		pow:=NewProofOfWork(block)
+		pow := NewProofOfWork(block)
 		fmt.Printf("POW: %s\n", strconv.FormatBool(pow.Validate()))
 		fmt.Println()
 	}
@@ -120,8 +128,8 @@ type Blockchain struct {
 }
 
 func (bc *Blockchain) AddBlock(data string) {
-	prevBlock:=bc.blocks[len(bc.blocks) - 1]
-	newBlock:=NewBlock(data, prevBlock.Hash)
+	prevBlock := bc.blocks[len(bc.blocks)-1]
+	newBlock := NewBlock(data, prevBlock.Hash)
 	bc.blocks = append(bc.blocks, newBlock)
 }
 
