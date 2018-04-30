@@ -115,7 +115,7 @@ func handleConn(conn net.Conn) {
 				newBlockchain := append(Blockchain, newBlock)
 				replaceChain(newBlockchain)
 			}
-			bcServer <- Blockchain
+				bcServer <- Blockchain
 			io.WriteString(conn, "\nEnter a new BPM:")
 		}
 	}()
@@ -131,7 +131,7 @@ func handleConn(conn net.Conn) {
 		}
 	}()
 
-	for range bcServer{
+	for range bcServer {
 		spew.Dump(Blockchain)
 	}
 }
