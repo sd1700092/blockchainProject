@@ -162,7 +162,7 @@ func isBlockValid(newBlock, oldBlock Block) bool {
 }
 
 func calculateHash(block Block) string {
-	record := strconv.Itoa(block.Index) + block.Timestamp + strconv.Itoa(block.BPM) + block.PrevHash
+	record := strconv.Itoa(block.Index) + block.Timestamp + strconv.Itoa(block.BPM) + block.PrevHash + block.Nonce
 	h := sha256.New()
 	h.Write([]byte(record))
 	hashed := h.Sum(nil)
