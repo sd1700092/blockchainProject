@@ -61,10 +61,9 @@ func allocate(noOfJobs int) {
 
 func result(done chan bool) {
 	for result := range results {
-		fmt.Printf("Job id %d, input random no %d, sum of digits %d\n", result.job.id, result.job.randomno, result.sumofdigits)
+		fmt.Printf("Job id %d, intput random no %d, sum of digits %d\n", result.job.id, result.job.randomno, result.sumofdigits)
 	}
 	done <- true
-
 }
 
 func main() {
